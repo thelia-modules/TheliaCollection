@@ -1,0 +1,132 @@
+
+<div id="manage-collection">
+
+
+    <div>
+        collections
+    </div>
+    <div id="collection-list">
+    {loop type="thelia_collection" name="existing-collections" item_id=$itemId item_type=$itemType code="default" limit=1}
+        {$currentCollection = $ID}
+        {loop type="thelia_collection_item" name="existing-collections-items" thelia_collection_id=$ID}
+
+            {loop type=$ITEM_TYPE name="{$ITEM_TYPE}-{$ITEM_ID}" id=$ITEM_ID}
+                {$ITEM_ID} - {$ITEM_TYPE} - {$TITLE}
+            {/loop}
+        {/loop}
+    {/loop}
+    {elseloop rel="existing-collections"}
+    <form id="create-collection">
+        <input type="text" name="collection-title" value="" required>
+        <button id="" class="btn" type="submit">Create a new collection</button>
+    </form>
+    {/elseloop}
+    </div>
+
+
+
+    <form id="associate-item" style="display:none">
+        <div>search</div>
+        <select name="type">
+            <option value="folder">Folder</option>
+            <option value="content">Content</option>
+            <option value="category">Category</option>
+            <option value="product">Product</option>
+        </select>
+        <select name="item">
+            {loop type={$itemType} name="test"}
+            <option value="{$ID}">{$TITLE}</option>
+            {/loop}
+        </select>
+        <button type="submit">Associate to this collection</button>
+    </form>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    const container = document.getElementById('manage-collection');
+    const createCollection = document.getElementById('create-collection');
+    const collectionsList = document.getElementById('collection-list');
+    const associateContainer = document.getElementById('associate-item');
+    const itemList = associateContainer.querySelector('select[name="item"]');
+    const typeSelector = associateContainer.querySelector('select[name="type"]');
+    const itemSelector = associateContainer.querySelector('select[name="item"]');
+
+    let currentCollection = "{$currentCollection}";
+
+    async function updateCollections() {
+        const collections = await axios.get('/open_api/collection', {
+        params: {
+            itemId: {$itemId},
+            itemType: "{$itemType}",
+            code: "default",
+            limit: 1
+        }
+        })
+
+        collectionsList.innerHTML = '';
+        for (const collection of collections.data) {
+            const el = document.createElement('div')
+            el.innerText = collection.title + ' - '+ collection.code
+            collectionsList.appendChild(el)
+        }
+        currentCollection = collections.data[0].id
+
+    }
+
+    async function fetchListOfItems(itemType) {
+        const response = await axios.get('/open_api/'+itemType+'/search');
+
+        itemList.innerHTML = '';
+
+        for (const item of response.data) {
+            const opt = document.createElement('option')
+            opt.value = item.id;
+            opt.innerText = item.i18n.title
+            itemList.appendChild(opt);
+        }
+
+        return response
+    }
+
+    async function associateItem(currentCollection, associateItemId, associateItemType) {
+
+        if (!currentCollection) return;
+
+        const response = await axios.post(`/open_api/collection/`+currentCollection+`/item`, {
+            itemId: associateItemId,
+            itemType: associateItemType,
+        })
+
+        return response;
+    }
+
+    createCollection.addEventListener('submit', e => {
+        e.preventDefault();
+        axios.post('/open_api/collection', {
+            itemId: {$itemId},
+            itemType: "{$itemType}",
+            code: "default",
+            title: e.target.elements['collection-title'].value
+        }).then(() => {
+            associateContainer.style.display = "block"
+            updateCollections()
+        })
+    })
+
+    typeSelector.addEventListener('change', e => {
+        fetchListOfItems(e.target.value)
+    })
+
+    itemList.addEventListener('change', e => {
+
+    })
+
+    associateContainer.addEventListener('submit', async e => {
+        e.preventDefault();
+      await associateItem(currentCollection, itemSelector.value, typeSelector.value)
+      updateCollections()
+    })
+
+</script>
