@@ -37,6 +37,10 @@ class CollectionService
         ?string $locale = null,
         ?int $position = null
     ): TheliaCollection {
+        if (null === $title && null !== $code) {
+            $title = $code;
+        }
+        
         return $this->createOrUpdateCollection(
             $itemId,
             $itemType,
