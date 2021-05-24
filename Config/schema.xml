@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database defaultIdMethod="native" name="TheliaMain"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../../vendor/thelia/propel/resources/xsd/database.xsd" >
+
+    <table name="thelia_collection" namespace="TheliaCollection\Model">
+      <column name="id" primaryKey="true" required="true" type="INTEGER" autoIncrement="true"/>
+      <column name="title" type="VARCHAR" />
+      <column name="code" type="VARCHAR" />
+      <column name="visible" type="TINYINT" />
+      <column name="position" type="INTEGER" />
+      <column name="item_type" type="VARCHAR" />
+      <column name="item_id" type="INTEGER" />
+      <index>
+        <index-column name="item_type" />
+        <index-column name="item_id" />
+      </index>
+      <behavior name="i18n">
+        <parameter name="i18n_columns" value="title" />
+      </behavior>
+    </table>
+
+    <table name="thelia_collection_item" namespace="TheliaCollection\Model">
+      <column name="id" primaryKey="true" required="true" type="INTEGER" autoIncrement="true"/>
+      <column name="thelia_collection_id" type="INTEGER" />
+      <column name="item_type" type="VARCHAR" />
+      <column name="item_id" type="INTEGER" />
+      <column name="position" type="INTEGER" />
+      <index>
+        <index-column name="item_type" />
+        <index-column name="item_id" />
+      </index>
+      <foreign-key foreignTable="thelia_collection" name="fk_thelia_collection_thelia_item_collection_id" onDelete="CASCADE" onUpdate="RESTRICT">
+        <reference foreign="id" local="thelia_collection_id" />
+      </foreign-key>
+    </table>
+</database>

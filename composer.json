@@ -1,0 +1,13 @@
+{
+    "name": "thelia/thelia-collection-module",
+    "description": "Create a collection of any item and associate it to any other item",
+    "license": "LGPL-3.0-or-later",
+    "type": "thelia-module",
+    "require": {
+        "thelia/installer": "~1.1",
+        "thelia/open-api-module": "dev-main"
+    },
+    "extra": {
+        "installer-name": "TheliaCollection"
+    }
+}
