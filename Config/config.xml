@@ -4,4 +4,12 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
+  <hooks>
+    <hook id="theliacollection.hook" class="TheliaCollection\Hook\TheliaCollectionBackHook">
+        <tag name="hook.event_listener" event="product.tab" type="backoffice" method="onProductTab"/>
+        <tag name="hook.event_listener" event="category.tab" type="backoffice" method="onCategoryTab"/>
+        <tag name="hook.event_listener" event="content.tab" type="backoffice" method="onContentTab"/>
+        <tag name="hook.event_listener" event="folder.tab" type="backoffice" method="onFolderTab"/>
+    </hook>
+  </hooks>
 </config>

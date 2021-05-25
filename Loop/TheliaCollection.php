@@ -14,12 +14,12 @@ use TheliaCollection\Model\TheliaCollectionQuery;
 /**
  * Class TheliaCollection.
  *
- * @method int getId()
- * @method int getItemId()
+ * @method int    getId()
+ * @method int    getItemId()
  * @method string getItemType()
  * @method string getCode()
- * @method boolean getOnlyVisible()
- * @method boolean getOrder()
+ * @method bool   getOnlyVisible()
+ * @method bool   getOrder()
  */
 class TheliaCollection extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -42,7 +42,7 @@ class TheliaCollection extends BaseI18nLoop implements PropelSearchLoopInterface
         $this->configureI18nProcessing(
             $query,
             [
-                'TITLE'
+                'TITLE',
             ]
         );
 
@@ -82,6 +82,7 @@ class TheliaCollection extends BaseI18nLoop implements PropelSearchLoopInterface
             default:
                 $query->orderByPosition(Criteria::ASC);
         }
+
         return $query;
     }
 
