@@ -3,7 +3,6 @@
 namespace TheliaCollection\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -11,13 +10,14 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use TheliaCollection\Model\TheliaCollectionItemQuery;
-use TheliaCollection\Model\TheliaCollectionQuery;
 
 /**
  * Class TheliaCollectionItem.
  *
- * @method int getId()
- * @method int getTheliaCollectionId()
+ * @method int    getId()
+ * @method string getItemType()
+ * @method int    getItemId()
+ * @method int    getTheliaCollectionId()
  */
 class TheliaCollectionItem extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -25,6 +25,8 @@ class TheliaCollectionItem extends BaseLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('id'),
+            Argument::createIntTypeArgument('item_id'),
+            Argument::createAlphaNumStringTypeArgument('item_type'),
             Argument::createIntTypeArgument('thelia_collection_id')
         );
     }
@@ -39,6 +41,14 @@ class TheliaCollectionItem extends BaseLoop implements PropelSearchLoopInterface
 
         if (null !== $theliaCollectionId = $this->getTheliaCollectionId()) {
             $query->filterByTheliaCollectionId($theliaCollectionId);
+        }
+
+        if (null !== $itemId = $this->getItemId()) {
+            $query->filterByItemId($itemId);
+        }
+
+        if (null !== $itemType = $this->getItemType()) {
+            $query->filterByItemType($itemType);
         }
 
         $query->orderByPosition(Criteria::ASC);
