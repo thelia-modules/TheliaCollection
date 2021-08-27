@@ -53,7 +53,7 @@
     const typeSelector = associateContainer.querySelector('select[name="type"]');
     const itemSelector = associateContainer.querySelector('select[name="item"]');
 
-    let currentCollection = "{$currentCollection}";
+    let currentCollection = "{$currentCollection|default:null}";
 
     async function updateCollections() {
         const collections = await axios.get('/open_api/collection', {
