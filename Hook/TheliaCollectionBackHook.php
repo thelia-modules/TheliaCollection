@@ -3,6 +3,7 @@
 namespace TheliaCollection\Hook;
 
 use Thelia\Core\Event\Hook\HookRenderBlockEvent;
+use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 use TheliaCollection\TheliaCollection;
 
@@ -14,6 +15,11 @@ class TheliaCollectionBackHook extends BaseHook
 
     public function onCategoryTab(HookRenderBlockEvent $event): void
     {
+    }
+
+    public function onModuleConfig(HookRenderEvent $event)
+    {
+        $event->add($this->render('thelia-collection-configuration.html'));
     }
 
     public function onContentTab(HookRenderBlockEvent $event): void

@@ -1,0 +1,172 @@
+<div class="container" id="wrapper">
+    <div class="general-block-decorator">
+        <div class="title title-without-tabs">
+            {intl l="Configure Thelia Collection"}
+        </div>
+
+        <div class="row">
+          <div class="TC__Wrapper" id="manage-collection">
+            <div class="TC__Header">
+                <div class="TC__Header__Title">Thelia Collection</div>
+                <div class="TC__Header__Infos">
+                    <span class="TC__Header__Description">
+                        Create a collection of any item and associate it to any other item
+                    </span>
+                </div>
+            </div>
+
+            <div class="TC__Content">
+                <form id="create-collection">
+                    <div class="TC__Title">Créer une collection</div>
+
+                    <div class="TC__Fields">
+                        <div class="TC__Field" style="width: 70%;">
+                            <label for="collection-name">Nom</label>
+                            <input value="" type="text" id="collection-name" class="Input__Text" placeholder="Nom de la collection" required>
+                        </div>
+
+                        <div class="TC__Field" style="width: 30%;">
+                            <label for="collection-code">Code</label>
+                            <input value="" type="text" id="collection-code" class="Input__Text" placeholder="Code de la collection" required>
+                        </div>
+        
+                        <button class="TC__Button" type="submit" style="height: 40px;">
+                            Créer
+                        </button>
+                    </div>
+                </form>
+
+                <div id="collection-list">
+                    <div class="TC__Title">Liste des collections</div>
+                    <div class="TC__Table__Wrapper">
+                        <table class="TC__Table">
+                            <thead class="TC__Table__Header">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Titre</th>
+                                <th scope="col">Code</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {loop type="thelia_collection" name="collections"}
+                                    <tr class="TC__Table__Row">
+                                        <td class="TC__Table__Row__Id">#{$ID}</td>
+                                        <td class="TC__Table__Row__Title">{$TITLE}</td>
+                                        <td class="TC__Table__Row__Title">{$CODE}</td>
+                                        <td class="TC__Table__Row__Actions">
+                                          <div class="TC__Table__Row__Actions__Wrapper">
+                                              <button class="TC__Button" data-collection-id="{$ID}">
+                                                  <i class="fas fa-trash-alt"></i>
+                                              </button>
+                                          </div>
+                                      </td>
+                                    </tr>
+                                {/loop}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{encore_module_asset file='assets/css/override.css' module="TheliaCollection"}" />
+<link rel="stylesheet" href="{encore_module_asset file='assets/css/styles.css' module="TheliaCollection"}" />
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  const createCollectionForm = document.querySelector('#create-collection');
+  const collectionNameInput = document.querySelector('#create-collection #collection-name');
+  const collectionCodeInput = document.querySelector('#create-collection #collection-code');
+  const collectionList = document.querySelector('#collection-list');
+
+  async function createCollection(name, code) {
+    const response = await axios.post('/open_api/collection', {
+      title: name,
+      code: code,
+    });
+
+    if (response.status === 200) {
+      createRow(response.data);
+    }
+  }
+
+  async function deleteCollection(collectionId) {
+    const response = await axios.delete('/open_api/collection/' + collectionId);
+
+    if (response.status === 204) {
+      deleteRow(collectionId);
+    }
+  }
+
+  createCollectionForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const collectionName = collectionNameInput.value;
+    const collectionCode = collectionCodeInput.value;
+
+    createCollection(collectionName, collectionCode);
+  });
+
+  collectionList.querySelectorAll('.TC__Button').forEach(el => {
+      el.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const collectionId = el.dataset.collectionId;
+
+          await deleteCollection(collectionId);
+      })
+  })
+
+  const createRow = (data) => {
+        const collectionRow = document.createElement('tr');
+        collectionRow.classList.add('TC__Table__Row');
+
+        const collectionId = document.createElement('td');
+        collectionId.classList.add('TC__Table__Row__Id');
+        collectionId.innerText = '#' + data.id;
+
+        const collectionTitle = document.createElement('td');
+        collectionTitle.classList.add('TC__Table__Row__Title');
+        collectionTitle.innerText = data.title;
+
+        const collectionCode = document.createElement('td');
+        collectionCode.classList.add('TC__Table__Row__Title');
+        collectionCode.innerText = data.code;
+
+        const collectionActions = document.createElement('td');
+        collectionActions.classList.add('TC__Table__Row__Actions');
+
+        const collectionActionsWrapper = document.createElement('div');
+        collectionActionsWrapper.classList.add('TC__Table__Row__Actions__Wrapper');
+
+        const collectionDeleteButton = document.createElement('button');
+        collectionDeleteButton.classList.add('TC__Button');
+        collectionDeleteButton.setAttribute('data-collection-id', data.id);
+
+        const collectionDeleteButtonIcon = document.createElement('i');
+        collectionDeleteButtonIcon.classList.add('fas', 'fa-trash-alt');
+        collectionDeleteButton.appendChild(collectionDeleteButtonIcon);
+
+        collectionActionsWrapper.appendChild(collectionDeleteButton);
+        collectionActions.appendChild(collectionActionsWrapper);
+
+        collectionRow.appendChild(collectionId);
+        collectionRow.appendChild(collectionTitle);
+        collectionRow.appendChild(collectionCode);
+        collectionRow.appendChild(collectionActions);
+
+        collectionDeleteButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await deleteCollection(data.id);
+        })
+
+        collectionList.querySelector('tbody').appendChild(collectionRow);
+    }
+
+    const deleteRow = (collectionId) => {
+      const collectionRow = collectionList.querySelector('[data-collection-id="' + collectionId + '"]').closest('tr');
+      collectionRow.remove();
+    } 
+</script>
