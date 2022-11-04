@@ -1,132 +1,182 @@
-
-<div id="manage-collection">
-
-
-    <div>
-        collections
-    </div>
-    <div id="collection-list">
-    {loop type="thelia_collection" name="existing-collections" item_id=$itemId item_type=$itemType code="default" limit=1}
-        {$currentCollection = $ID}
-        {loop type="thelia_collection_item" name="existing-collections-items" thelia_collection_id=$ID}
-
-            {loop type=$ITEM_TYPE name="{$ITEM_TYPE}-{$ITEM_ID}" id=$ITEM_ID}
-                {$ITEM_ID} - {$ITEM_TYPE} - {$TITLE}
-            {/loop}
-        {/loop}
-    {/loop}
-    {elseloop rel="existing-collections"}
-    <form id="create-collection">
-        <input type="text" name="collection-title" value="" required>
-        <button id="" class="btn" type="submit">Create a new collection</button>
-    </form>
-    {/elseloop}
+<div class="TC__Wrapper" id="manage-collection">
+    <div class="TC__Header">
+        <div class="TC__Header__Title">Thelia Collection</div>
+        <div class="TC__Header__Infos">
+            <span class="TC__Header__Description">
+                Create a collection of any item and associate it to any other item
+            </span>
+            <button class="TC__Button">
+                Créer une collection
+            </button>
+        </div>
     </div>
 
+    <div class="TC__Content">
+        <div id="linked-collection-list">
+            <div class="TC__Title">Liste des collections liées</div>
+            <div class="TC__Table__Wrapper">
+                <table class="TC__Table">
+                    <thead class="TC__Table__Header">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Titre</th>
+                        <th scope="col">Code</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {loop type="thelia_collection_item" name="collections-item" item_id=$itemId}
+                            {loop type="thelia_collection" name="collections" id=$THELIA_COLLECTION_ID}
+                                <tr class="TC__Table__Row">
+                                    <td class="TC__Table__Row__Id">#{$ID}</td>
+                                    <td class="TC__Table__Row__Title">{$TITLE}</td>
+                                    <td class="TC__Table__Row__Title">{$CODE}</td>
+                                    <td class="TC__Table__Row__Actions">
+                                        <div class="TC__Table__Row__Actions__Wrapper">
+                                            <button class="TC__Table__Row__Link__Action" data-collection-id="{$ID}" data-item-type="{$itemType}" data-item-id="{$itemId}">
+                                                <i class="fas fa-unlink"></i> Délier
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/loop}
+                        {/loop}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
+        <div id="associate-collection">
+            <div class="TC__Title">Lier une collection existante</div>
 
-    <form id="associate-item" style="display:none">
-        <div>search</div>
-        <select name="type">
-            <option value="folder">Folder</option>
-            <option value="content">Content</option>
-            <option value="category">Category</option>
-            <option value="product">Product</option>
-        </select>
-        <select name="item">
-            {loop type={$itemType} name="test"}
-            <option value="{$ID}">{$TITLE}</option>
-            {/loop}
-        </select>
-        <button type="submit">Associate to this collection</button>
-    </form>
+            <div class="TC__Fields">
+                <div>
+                    <label for="collection-list">Nom de la collection</label>
+                    <select id="collection-list" name="collection-list" class="Input__Select">
+                        {loop type="thelia_collection" name="existing-collections"}
+                            <option value="{$ID}">#{$ID} - {$TITLE}</option>
+                        {/loop}
+                    </select>
+                </div>
+
+                <button class="TC__Button" style="height: 40px;">
+                    <i class="fas fa-link"></i> Lier
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
+<link rel="stylesheet" href="{encore_module_asset file='assets/css/styles.css' module="TheliaCollection"}" />
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    const container = document.getElementById('manage-collection');
-    const createCollection = document.getElementById('create-collection');
-    const collectionsList = document.getElementById('collection-list');
-    const associateContainer = document.getElementById('associate-item');
-    const itemList = associateContainer.querySelector('select[name="item"]');
-    const typeSelector = associateContainer.querySelector('select[name="type"]');
-    const itemSelector = associateContainer.querySelector('select[name="item"]');
+    const linkedCollectionList = document.querySelector('#linked-collection-list');
+    const associateCollection = document.querySelector('#associate-collection');
 
-    let currentCollection = "{$currentCollection|default:null}";
+    async function deleteAssociation(collectionId, itemId, itemType) {
+        const response = await axios.delete(
+            "/open_api/collection/" + collectionId + "/item",
+            {
+                data: {
+                    itemId,
+                    itemType
+                }
+            }
+        );
 
-    async function updateCollections() {
-        const collections = await axios.get('/open_api/collection', {
-        params: {
-            itemId: {$itemId},
-            itemType: "{$itemType}",
-            code: "default",
-            limit: 1
+        if (response.status === 200) {
+            deleteRow(collectionId);
         }
-        })
-
-        collectionsList.innerHTML = '';
-        for (const collection of collections.data) {
-            const el = document.createElement('div')
-            el.innerText = collection.title + ' - '+ collection.code
-            collectionsList.appendChild(el)
-        }
-        currentCollection = collections.data[0].id
-
-    }
-
-    async function fetchListOfItems(itemType) {
-        const response = await axios.get('/open_api/'+itemType+'/search');
-
-        itemList.innerHTML = '';
-
-        for (const item of response.data) {
-            const opt = document.createElement('option')
-            opt.value = item.id;
-            opt.innerText = item.i18n.title
-            itemList.appendChild(opt);
-        }
-
-        return response
     }
 
     async function associateItem(currentCollection, associateItemId, associateItemType) {
+        const selectedCollectionId = associateCollection.querySelector('select#collection-list').value;
 
-        if (!currentCollection) return;
+        const response = await axios.post(
+            "/open_api/collection/" + selectedCollectionId + "/item",
+            {
+                itemType: associateItemType,
+                itemId: associateItemId,
+            }
+        );
 
-        const response = await axios.post(`/open_api/collection/`+currentCollection+`/item`, {
-            itemId: associateItemId,
-            itemType: associateItemType,
-        })
-
-        return response;
+        if (response.status === 200) {
+            createRow(response.data, associateItemId, associateItemType);
+        }
     }
 
-    createCollection.addEventListener('submit', e => {
-        e.preventDefault();
-        axios.post('/open_api/collection', {
-            itemId: {$itemId},
-            itemType: "{$itemType}",
-            code: "default",
-            title: e.target.elements['collection-title'].value
-        }).then(() => {
-            associateContainer.style.display = "block"
-            updateCollections()
+    linkedCollectionList.querySelectorAll('.TC__Table__Row__Link__Action').forEach(el => {
+        el.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const collectionId = el.dataset.collectionId;
+            const itemId = el.dataset.itemId;
+            const itemType = el.dataset.itemType;
+
+            await deleteAssociation(collectionId, itemId, itemType);
         })
     })
 
-    typeSelector.addEventListener('change', e => {
-        fetchListOfItems(e.target.value)
-    })
-
-    itemList.addEventListener('change', e => {
-
-    })
-
-    associateContainer.addEventListener('submit', async e => {
+    associateCollection.querySelector(".TC__Button").addEventListener('click', async (e) => {
         e.preventDefault();
-      await associateItem(currentCollection, itemSelector.value, typeSelector.value)
-      updateCollections()
+        const associateItemId = "{$itemId}"
+        const associateItemType = "{$itemType}"
+
+
+        await associateItem(associateCollection, associateItemId, associateItemType);
     })
 
+    const createRow = (data, associateItemId, associateItemType) => {
+        const collectionRow = document.createElement('tr');
+        collectionRow.classList.add('TC__Table__Row');
+
+        const collectionId = document.createElement('td');
+        collectionId.classList.add('TC__Table__Row__Id');
+        collectionId.innerText = '#' + data.id;
+
+        const collectionTitle = document.createElement('td');
+        collectionTitle.classList.add('TC__Table__Row__Title');
+        collectionTitle.innerText = data.title;
+
+        const collectionCode = document.createElement('td');
+        collectionCode.classList.add('TC__Table__Row__Title');
+        collectionCode.innerText = data.code;
+
+        const collectionActions = document.createElement('td');
+        collectionActions.classList.add('TC__Table__Row__Actions');
+
+        const collectionActionsWrapper = document.createElement('div');
+        collectionActionsWrapper.classList.add('TC__Table__Row__Actions__Wrapper');
+
+        const collectionUnlinkButton = document.createElement('button');
+        collectionUnlinkButton.classList.add('TC__Table__Row__Link__Action');
+        collectionUnlinkButton.setAttribute('data-collection-id', data.id);
+        collectionUnlinkButton.setAttribute('data-item-type', associateItemType);
+        collectionUnlinkButton.setAttribute('data-item-id', associateItemId);
+
+        const collectionUnlinkButtonIcon = document.createElement('i');
+        collectionUnlinkButtonIcon.classList.add('fas', 'fa-unlink');
+        collectionUnlinkButton.appendChild(collectionUnlinkButtonIcon);
+        collectionUnlinkButton.appendChild(document.createTextNode(' Délier'));
+
+        collectionActionsWrapper.appendChild(collectionUnlinkButton);
+        collectionActions.appendChild(collectionActionsWrapper);
+
+        collectionRow.appendChild(collectionId);
+        collectionRow.appendChild(collectionTitle);
+        collectionRow.appendChild(collectionCode);
+        collectionRow.appendChild(collectionActions);
+
+        collectionUnlinkButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await deleteAssociation(data.id, associateItemId, associateItemType);
+        })
+
+        linkedCollectionList.querySelector('tbody').appendChild(collectionRow);
+    }
+
+    const deleteRow = (collectionId) => {
+        const collectionRow = linkedCollectionList.querySelector('[data-collection-id="' + collectionId + '"]').closest('tr');
+        collectionRow.remove();
+    }
 </script>

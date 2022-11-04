@@ -178,36 +178,36 @@ class TheliaCollection extends BaseApiModel
     /**
      * @return string
      */
-    public function getItemType(): string
+    public function getItemType(): ?string
     {
-        return $this->itemType;
+        return $this->itemType ?? null;
     }
 
     /**
      * @param string $itemType
      * @return TheliaCollection
      */
-    public function setItemType(string $itemType): TheliaCollection
+    public function setItemType(?string $itemType): TheliaCollection
     {
-        $this->itemType = $itemType;
+        $this->itemType = $itemType ?? null;
         return $this;
     }
 
     /**
      * @return int
      */
-    public function getItemId(): int
+    public function getItemId(): ?int
     {
-        return $this->itemId;
+        return $this->itemId ?? null;
     }
 
     /**
      * @param int $itemId
      * @return TheliaCollection
      */
-    public function setItemId(int $itemId): TheliaCollection
+    public function setItemId(?int $itemId): TheliaCollection
     {
-        $this->itemId = $itemId;
+        $this->itemId = $itemId ?? null;
         return $this;
     }
 

@@ -22,15 +22,14 @@ class CollectionService
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         RequestStack $requestStack
-    )
-    {
+    ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->session = $requestStack->getCurrentRequest()->getSession();
     }
 
     public function createCollection(
-        int $itemId,
-        string $itemType,
+        ?int $itemId = null,
+        ?string $itemType = null,
         ?string $code = null,
         ?string $title = null,
         ?bool $visible = true,
@@ -40,7 +39,7 @@ class CollectionService
         if (null === $title && null !== $code) {
             $title = $code;
         }
-        
+
         return $this->createOrUpdateCollection(
             $itemId,
             $itemType,
@@ -96,8 +95,7 @@ class CollectionService
         string $itemType,
         int $collectionId,
         ?int $position = null
-    ): TheliaCollectionItem
-    {
+    ): TheliaCollectionItem {
         $collectionItem = (new TheliaCollectionItem())
             ->setItemId($itemId)
             ->setItemType($itemType)
@@ -116,8 +114,7 @@ class CollectionService
         ?int $collectionId = null,
         ?int $position = null,
         ?string $positionMovement = null
-    )
-    {
+    ) {
         $collectionItem = $this->findCollectionItem($collectionItemId, $itemId, $itemType, $collectionId);
 
         if (null === $collectionItem) {
@@ -144,8 +141,7 @@ class CollectionService
         ?int $itemId = null,
         ?string $itemType = null,
         ?int $collectionId = null
-    )
-    {
+    ) {
         $collectionItem = $this->findCollectionItem($collectionItemId, $itemId, $itemType, $collectionId);
 
         if (null === $collectionItem) {
@@ -160,8 +156,7 @@ class CollectionService
         ?int $itemId = null,
         ?string $itemType = null,
         ?int $collectionId = null
-    )
-    {
+    ) {
         $collectionItemQuery = TheliaCollectionItemQuery::create();
         $filtered = false;
 
