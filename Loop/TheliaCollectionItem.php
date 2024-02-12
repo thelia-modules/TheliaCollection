@@ -18,6 +18,7 @@ use TheliaCollection\Model\TheliaCollectionItemQuery;
  * @method string getItemType()
  * @method int    getItemId()
  * @method int    getTheliaCollectionId()
+ * @method string getCode()
  */
 class TheliaCollectionItem extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -27,7 +28,8 @@ class TheliaCollectionItem extends BaseLoop implements PropelSearchLoopInterface
             Argument::createIntTypeArgument('id'),
             Argument::createIntTypeArgument('item_id'),
             Argument::createAlphaNumStringTypeArgument('item_type'),
-            Argument::createIntTypeArgument('thelia_collection_id')
+            Argument::createIntTypeArgument('thelia_collection_id'),
+            Argument::createAlphaNumStringTypeArgument('code')
         );
     }
 
@@ -41,6 +43,13 @@ class TheliaCollectionItem extends BaseLoop implements PropelSearchLoopInterface
 
         if (null !== $theliaCollectionId = $this->getTheliaCollectionId()) {
             $query->filterByTheliaCollectionId($theliaCollectionId);
+        }
+
+        if (null !== $code = $this->getCode()) {
+            $query
+                ->useTheliaCollectionQuery()
+                ->filterByCode($code)
+                ->endUse();
         }
 
         if (null !== $itemId = $this->getItemId()) {
@@ -66,8 +75,7 @@ class TheliaCollectionItem extends BaseLoop implements PropelSearchLoopInterface
                 ->set('THELIA_COLLECTION_ID', $entry->getTheliaCollectionId())
                 ->set('POSITION', $entry->getPosition())
                 ->set('ITEM_TYPE', $entry->getItemType())
-                ->set('ITEM_ID', $entry->getItemId())
-            ;
+                ->set('ITEM_ID', $entry->getItemId());
 
             $this->addOutputFields($row, $entry);
 
