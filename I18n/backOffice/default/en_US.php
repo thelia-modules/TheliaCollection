@@ -11,5 +11,10 @@
  */
 
 return [
-    // 'an english string' => 'The displayed english string',
+    'All' => 'All',
+    'Content' => 'Content',
+    'Folder' => 'Folder',
+    'Category' => 'Category',
+    'Product' => 'Product',
+    'Item Type' => 'Item Type'
 ];

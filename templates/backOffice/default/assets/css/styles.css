@@ -23,8 +23,16 @@
   width: max-content;
 }
 
+.TC__Button__Edit {
+  background-color: #5bc0de;
+}
+
 .TC__Button:hover {
   background-color: #FA533C;
+}
+
+.TC__Button__Edit:hover {
+  background-color: #64d7f9;
 }
 
 .TC__Header__Title, .TC__Title {
@@ -157,6 +165,14 @@
   outline: 2px solid transparent;
   outline-offset: 2px;
   height: 40px;
+}
+
+.Input__Text__Lang {
+  border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.input-group-addon {
+  width: 1%;
 }
 
 .Input__Select {
