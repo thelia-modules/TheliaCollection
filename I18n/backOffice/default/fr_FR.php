@@ -22,4 +22,8 @@ return [
     'Create a collection of any item and associate it to any other item' => 'Créer une collection de n\'importe quel item et associez la à n\'importe quel autre item',
     'Create a collection' => 'Créer une collection',
     'Collection list' => 'Liste des collections',
+    'title_product' => 'Produits Liés',
+    'title_category' => 'Rubriques Liées',
+    'title_folder' => 'Dossiers Liés',
+    'title_content' => 'Contenus Liés',
 ];

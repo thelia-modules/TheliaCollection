@@ -16,5 +16,9 @@ return [
     'Folder' => 'Folder',
     'Category' => 'Category',
     'Product' => 'Product',
-    'Item Type' => 'Item Type'
+    'Item Type' => 'Item Type',
+    'title_product' => 'Products',
+    'title_category' => 'Categories',
+    'title_folder' => 'Folders',
+    'title_content' => 'Contents',
 ];

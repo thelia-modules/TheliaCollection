@@ -1,0 +1,32 @@
+{$items = []}
+{loop type="thelia_collection_item" name="collections-item" thelia_collection_id=$thelia_collection_id}
+    {$items[$ITEM_TYPE][] = {$ITEM_ID}}
+{/loop}
+{foreach from=['category','product', 'folder', 'content'] item=type}
+    {if isset($items[$type])}
+        <h2 class="TC__Table__Title">{intl l='title_'|cat:$type  d='theliacollection.bo.default'}</h2>
+        <table class="TC__Table">
+            <thead class="TC__Table__Header">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Titre</th>
+            </tr>
+            </thead>
+            <tbody>
+            {loop type={$type} name="{$type}-colletion-items" id={','|implode:$items[$type]} visible="*"}
+                <tr class="TC__Table__Row">
+                    <td class="TC__Table__Row__Id">#{$ID}</td>
+                    <td class="TC__Table__Row__Title">{$TITLE}</td>
+                    <td class="TC__Table__Row__Actions">
+                        <div class="TC__Table__Row__Actions__Wrapper">
+                            <button class="TC__Button" data-delete data-item-type="{$type}" data-item-id="{$ID}">
+                                <i class="fas fa-unlink"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            {/loop}
+            </tbody>
+        </table>
+    {/if}
+{/foreach}

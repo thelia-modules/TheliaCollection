@@ -76,9 +76,9 @@
                                               <button class="TC__Button" data-delete data-collection-id="{$ID}">
                                                   <i class="fas fa-trash-alt"></i>
                                               </button>
-                                              <button class="TC__Button TC__Button__Edit" data-edit data-collection-id="{$ID}">
+                                              <a class="TC__Button TC__Button__Edit" href="{url path="/admin/module/TheliaCollection/view?thelia_collection_id={$ID}"}">
                                                   <i class="fas fa-edit"></i>
-                                              </button>
+                                              </a>
                                           </div>
                                       </td>
                                     </tr>
@@ -124,14 +124,15 @@
 
   function template( templateId, data ){
       const template = document.getElementById( templateId );
-      template.innerHTML = template.innerHTML
+      const templateCopy = document.createElement('template');
+      templateCopy.innerHTML = template.innerHTML
           .replace(
               /%(\w*)%/g,
               function( m, key ){
                   return data.hasOwnProperty( key ) ? data[ key ] : "";
               }
           );
-      const result = template.content.children;
+      const result = templateCopy.content.children;
       if (result.length === 1) return result[0];
       return result;
   }

@@ -1,3 +1,7 @@
+.modules-configure {
+  padding-top: 15px;
+}
+
 .TC__Header {
   background-color: #F5F5F5;
   padding-top: 40px;
@@ -182,6 +186,75 @@
   -moz-appearance: none;
   -webkit-appearance: none;
   appearance: none;
+}
+
+.TC__Results__wrapper {
+  position: relative;
+}
+
+.TC__Results {
+  padding: 10px;
+  position: absolute;
+  top: 0;
+  background: white;
+  min-width: 100%;
+  z-index: 1;
+}
+
+.TC__Results__Type ul {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.TC__Results__Type li {
+  list-style: none;
+}
+
+.TC__Results__Type button {
+  background: none;
+  color: inherit;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 5px;
+  border-radius: 4px;
+  text-align: left;
+  gap: 10px;
+}
+
+.TC__Results__Type button:hover {
+  background-color: #5bc0de20;
+}
+.TC__Results__Type button:after {
+  content: '+';
+  height: 20px;
+  width: 20px;
+  background-color: #5bc0de;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 18px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.TC__Results__Title {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 5px;
+}
+
+.TC__Table__Title {
+  font-weight: bold;
+  font-size: 1rem;
 }
 
 @media (min-width: 640px) {
