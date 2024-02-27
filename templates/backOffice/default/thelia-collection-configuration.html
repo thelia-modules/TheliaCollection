@@ -35,10 +35,10 @@
                             <label for="collection-item-type">{intl l="Item Type"}</label>
                             <select class="Input__Select"  id="collection-item-type">
                                 <option value="">{intl l="All"}</option>
-                                <option value="content">{intl l="Content"}</option>
-                                <option value="folder">{intl l="Folder"}</option>
-                                <option value="category">{intl l="Category"}</option>
-                                <option value="product">{intl l="Product"}</option>
+                                <option value="content">{intl l="content"}</option>
+                                <option value="folder">{intl l="folder"}</option>
+                                <option value="category">{intl l="category"}</option>
+                                <option value="product">{intl l="product"}</option>
                             </select>
                         </div>
 
@@ -62,14 +62,16 @@
                             <tr>
                                 <th scope="col">ID</th>
                                 <th scope="col">Titre</th>
+                                <th scope="col">Type</th>
                                 <th scope="col">Code</th>
                             </tr>
                             </thead>
                             <tbody>
-                                {loop type="thelia_collection" name="collections"}
+                                {loop type="thelia_collection" name="collections" order="id"}
                                     <tr class="TC__Table__Row">
                                         <td class="TC__Table__Row__Id">#{$ID}</td>
                                         <td class="TC__Table__Row__Title">{$TITLE}</td>
+                                        <td class="TC__Table__Row__Title">{if $ITEM_TYPE}{intl l=$ITEM_TYPE}{else}{intl l="All"}{/if}</td>
                                         <td class="TC__Table__Row__Title">{$CODE}</td>
                                         <td class="TC__Table__Row__Actions">
                                           <div class="TC__Table__Row__Actions__Wrapper">
@@ -120,6 +122,7 @@
   const createCollectionForm = document.querySelector('#create-collection');
   const collectionNameInput = document.querySelector('#create-collection #collection-name');
   const collectionCodeInput = document.querySelector('#create-collection #collection-code');
+  const collectionItemTypeInput = document.querySelector('#create-collection #collection-item-type');
   const collectionList = document.querySelector('#collection-list');
 
   function template( templateId, data ){
@@ -137,15 +140,26 @@
       return result;
   }
 
-  async function createCollection(name, code) {
-    const response = await axios.post('/open_api/collection', {
-      title: name,
-      code: code,
-    });
+  async function createCollection(name, code, itemType) {
+      const data = {
+          title: name,
+          code: code
+      };
+      if (itemType) {
+          data.itemType = itemType;
+      }
+    const response = await axios.post('/open_api/collection', data);
 
     if (response.status === 200) {
+       clearInputs();
       createRow(response.data);
     }
+  }
+
+  function clearInputs() {
+      collectionNameInput.value = '';
+      collectionCodeInput.value = '';
+      collectionItemTypeInput.value = '';
   }
 
   async function deleteCollection(collectionId) {
@@ -161,8 +175,9 @@
     
     const collectionName = collectionNameInput.value;
     const collectionCode = collectionCodeInput.value;
+    const collectionItemType = collectionItemTypeInput.value;
 
-    createCollection(collectionName, collectionCode);
+    createCollection(collectionName, collectionCode, collectionItemType);
   });
 
   initListeners();

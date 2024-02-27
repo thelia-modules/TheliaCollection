@@ -12,10 +12,10 @@
 
 return [
     'All' => 'Tout',
-    'Content' => 'Contenu',
-    'Folder' => 'Dossier',
-    'Category' => 'Rubrique',
-    'Product' => 'Produit',
+    'content' => 'Contenu',
+    'folder' => 'Dossier',
+    'category' => 'Rubrique',
+    'product' => 'Produit',
     'Item Type' => 'Type d\'item',
     'Name' => 'Nom',
     'Configure Thelia Collection' => 'Configuration de Thelia Collection',

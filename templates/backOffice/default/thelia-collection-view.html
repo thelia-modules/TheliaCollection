@@ -9,6 +9,7 @@
 
     {loop type="thelia_collection" name="collection" id=$thelia_collection_id}
     {$collectionTitle = $TITLE}
+    {$collectionType = $ITEM_TYPE}
     {/loop}
     <div class="modules-configure">
         <div id="wrapper" class="container">
@@ -78,6 +79,7 @@
 
 {block name="javascript-initialization"}
     {$items = []}
+
     {loop type="thelia_collection_item" name="collections-item" thelia_collection_id=$thelia_collection_id}
     {$items[$ITEM_TYPE][] = {$ITEM_ID}}
     {/loop}
@@ -85,6 +87,7 @@
     <script>
         const collectionList = {$items|json_encode nofilter};
         const collectionId = {$thelia_collection_id};
+        const collectionType = '{$collectionType}';
     </script>
 {literal}
     <script>
@@ -205,6 +208,7 @@
         }
 
         async function searchByType(query, type) {
+            if (collectionType && collectionType !== type) return [];
             const [visible, noVisible] = await Promise.all([searchVisible(query, type), searchNoVisible(query, type)]);
 
             return [... visible, ...noVisible];

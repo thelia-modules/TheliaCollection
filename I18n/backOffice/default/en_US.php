@@ -12,10 +12,10 @@
 
 return [
     'All' => 'All',
-    'Content' => 'Content',
-    'Folder' => 'Folder',
-    'Category' => 'Category',
-    'Product' => 'Product',
+    'content' => 'Content',
+    'folder' => 'Folder',
+    'category' => 'Category',
+    'product' => 'Product',
     'Item Type' => 'Item Type',
     'title_product' => 'Products',
     'title_category' => 'Categories',
