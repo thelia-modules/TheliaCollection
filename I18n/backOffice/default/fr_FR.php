@@ -26,4 +26,5 @@ return [
     'title_category' => 'Rubriques Liées',
     'title_folder' => 'Dossiers Liés',
     'title_content' => 'Contenus Liés',
+    'Create a collection linked to this item' => 'Créer une collection liée à cet item'
 ];

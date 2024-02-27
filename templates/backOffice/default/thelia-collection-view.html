@@ -10,6 +10,7 @@
     {loop type="thelia_collection" name="collection" id=$thelia_collection_id}
     {$collectionTitle = $TITLE}
     {$collectionType = $ITEM_TYPE}
+    {$collectionItemId = $ITEM_ID}
     {/loop}
     <div class="modules-configure">
         <div id="wrapper" class="container">
@@ -25,11 +26,21 @@
                         {intl l='Modifier votre Collection :'} {$collectionTitle}
                     </div>
                 </div>
+                {if $collectionItemId}
+                <div class="row">
+                    <div class="col-md-12">
+                        {intl l='Cette collection est lié à :'}
+                        {loop type={$collectionType} name="{$collectionType}-linked" id={$collectionItemId} visible="*"}
+                            <a href="{$URL}">#{$ID} - {$TITLE} (type : {intl l=$collectionType d='theliacollection.bo.default'})</a>
+                        {/loop}
+                    </div>
+                </div>
+                {/if}
                 <div class="row">
                     <div class="col-md-6">
                         <div class="TC__Fields">
                             <div class="TC__Field" style="width: 100%;max-width: 300px;">
-                                <label for="collection-name">{intl l="Ajouter des items"}</label>
+                                <label for="collection-name" style="font-weight: bold; padding-top: 10px">{intl l="Ajouter des items"}</label>
                                 <div class="input-group">
                                     <input value="" type="text" id="searchInput" class="Input__Text" placeholder="{intl l="Search"}">
                                 </div>
