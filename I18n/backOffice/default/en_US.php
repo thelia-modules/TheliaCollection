@@ -21,4 +21,12 @@ return [
     'title_category' => 'Categories',
     'title_folder' => 'Folders',
     'title_content' => 'Contents',
+    'Collection code' => 'Collection code',
+    'Collection Name' => 'Collection Name',
+    'Add items' => 'Add items',
+    'List collections attached to this item' => 'List collections attached to this item',
+    'List collections linked' => 'List collections linked',
+    'Link to an existing collection' => 'Link to an existing collection',
+    'Link' => 'Link',
+    'Unlink' => 'Unlink',
 ];

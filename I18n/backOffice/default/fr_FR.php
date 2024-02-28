@@ -26,5 +26,13 @@ return [
     'title_category' => 'Rubriques Liées',
     'title_folder' => 'Dossiers Liés',
     'title_content' => 'Contenus Liés',
-    'Create a collection linked to this item' => 'Créer une collection liée à cet item'
+    'Create a collection attached to this item' => 'Créer une collection attachée à cet item',
+    'Collection code' => 'Code de la collection',
+    'Collection Name' => 'Nom de la collection',
+    'Add items' => 'Ajouter des items',
+    'List collections attached to this item' => 'Liste des collections attachées à cet item',
+    'List collections linked' => 'Liste des collections liées',
+    'Link to an existing collection' => 'Lier une collection existante',
+    'Link' => 'Lier',
+    'Unlink' => 'Délier'
 ];

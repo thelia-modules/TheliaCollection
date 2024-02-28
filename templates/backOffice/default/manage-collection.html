@@ -3,40 +3,40 @@
         <div class="TC__Header__Title">Thelia Collection</div>
         <div>
             <form id="create-collection">
-                <div class="TC__Title">{intl l="Create a collection linked to this item" d='theliacollection.bo.default'}</div>
+                <div class="TC__Title">{intl l="Create a collection attached to this item" d='theliacollection.bo.default'}</div>
 
                 <div class="TC__Fields">
                     <div class="TC__Field" style="width: 70%;">
                         <label for="collection-name">{intl l="Name"}</label>
                         {loop type="lang" name="default-lang" default_only="1"}
                             <div class="input-group">
-                                <input value="" type="text" id="collection-name" class="Input__Text Input__Text__Lang" placeholder="Nom de la collection" required>
+                                <input value="" type="text" id="collection-name" class="Input__Text Input__Text__Lang" placeholder="{intl l="Collection Name" d='theliacollection.bo.default'}" required>
                                 <span class="input-group-addon Input__Text"><img class="img-flags" src="{image file="assets/img/svgFlags/$CODE.svg"}" alt="{$TITLE}" /></span>
                             </div>
                         {/loop}
                     </div>
 
                     <div class="TC__Field" style="width: 30%;">
-                        <label for="collection-code">Code</label>
-                        <input value="" type="text" id="collection-code" class="Input__Text" placeholder="Code de la collection" required>
+                        <label for="collection-code">{intl l="Code"}</label>
+                        <input value="" type="text" id="collection-code" class="Input__Text" placeholder="{intl l="Collection code" d='theliacollection.bo.default'}" required>
                     </div>
 
                     <button class="TC__Button" type="submit" style="height: 40px;">
-                        Créer
+                        {intl l="Create"}
                     </button>
                 </div>
             </form>
         </div>
         <div>
             <div id="linked-item-collection-list">
-                <div class="TC__Title">Liste des collections liées à cet item</div>
+                <div class="TC__Title">{intl l="List collections attached to this item" d='theliacollection.bo.default'}</div>
                 <div class="TC__Table__Wrapper">
                     <table class="TC__Table">
                         <thead class="TC__Table__Header">
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col">Titre</th>
-                            <th scope="col">Code</th>
+                            <th scope="col">{intl l="Title"}</th>
+                            <th scope="col">{intl l="Code"}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -56,15 +56,15 @@
 
     <div class="TC__Content">
         <div id="linked-collection-list">
-            <div class="TC__Title">Liste des collections liées</div>
+            <div class="TC__Title">{intl l="List collections linked" d='theliacollection.bo.default'}</div>
             <div class="TC__Table__Wrapper">
                 <table class="TC__Table">
                     <thead class="TC__Table__Header">
                     <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">Titre</th>
-                        <th scope="col">Code</th>
-                        <th scope="col">Actions</th>
+                        <th scope="col">{intl l="Title"}</th>
+                        <th scope="col">{intl l="Code"}</th>
+                        <th scope="col">{intl l="Actions"}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -77,7 +77,7 @@
                                     <td class="TC__Table__Row__Actions">
                                         <div class="TC__Table__Row__Actions__Wrapper">
                                             <button class="TC__Table__Row__Link__Action" data-collection-id="{$ID}" data-item-type="{$itemType}" data-item-id="{$itemId}">
-                                                <i class="fas fa-unlink"></i> Délier
+                                                <i class="fas fa-unlink"></i> {intl l="Unlink" d="theliacollection.bo.default"}
                                             </button>
                                         </div>
                                     </td>
@@ -90,11 +90,11 @@
         </div>
 
         <div id="associate-collection">
-            <div class="TC__Title">Lier une collection existante</div>
+            <div class="TC__Title">{intl l="Link to an existing collection" d="theliacollection.bo.default"}</div>
 
             <div class="TC__Fields">
                 <div>
-                    <label for="collection-list">Nom de la collection</label>
+                    <label for="collection-list">{intl l="Collection Name" d="theliacollection.bo.default"}</label>
                     <select id="collection-list" name="collection-list" class="Input__Select">
                         {loop type="thelia_collection" name="existing-collections"}
                             <option value="{$ID}">#{$ID} - {$TITLE}</option>
@@ -103,7 +103,7 @@
                 </div>
 
                 <button class="TC__Button" style="height: 40px;">
-                    <i class="fas fa-link"></i> Lier
+                    <i class="fas fa-link"></i> {intl l="Link" d="theliacollection.bo.default"}
                 </button>
             </div>
         </div>
@@ -122,6 +122,7 @@
     const collectionCodeInput = document.querySelector('#create-collection #collection-code');
     const collectionItemType = '{$itemType}';
     const collectionItemId = {$itemId};
+    const unlinkText = '{intl l="Unlink" d="theliacollection.bo.default"}';
 
     createCollectionForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -236,7 +237,7 @@
         const collectionUnlinkButtonIcon = document.createElement('i');
         collectionUnlinkButtonIcon.classList.add('fas', 'fa-unlink');
         collectionUnlinkButton.appendChild(collectionUnlinkButtonIcon);
-        collectionUnlinkButton.appendChild(document.createTextNode(' Délier'));
+        collectionUnlinkButton.appendChild(document.createTextNode(' ' + unlinkText));
 
         collectionActionsWrapper.appendChild(collectionUnlinkButton);
         collectionActions.appendChild(collectionActionsWrapper);
