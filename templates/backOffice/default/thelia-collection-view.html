@@ -1,0 +1,251 @@
+{extends file="admin-layout.tpl"}
+
+{block name="check-resource"}admin.theliacollection{/block}
+{block name="check-access"}view{/block}
+
+{block name="page-title"}{intl l='View Collection associations' }{/block}
+
+{block name="main-content"}
+
+    {loop type="thelia_collection" name="collection" id=$thelia_collection_id}
+    {$collectionTitle = $TITLE}
+    {$collectionType = $ITEM_TYPE}
+    {$collectionItemId = $ITEM_ID}
+    {/loop}
+    <div class="modules-configure">
+        <div id="wrapper" class="container">
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/modules'}">{intl l="Modules" }</a></li>
+                <li><a href="{url path='/admin/module/TheliaCollection'}">{intl l="TheliaCollection"}</a></li>
+                <li>{$collectionTitle}</li>
+            </ul>
+            <div class="general-block-decorator">
+                <div class="row">
+                    <div class="col-md-12 title title-without-tabs">
+                        {intl l='Modifier votre Collection :'} {$collectionTitle}
+                    </div>
+                </div>
+                {if $collectionItemId}
+                <div class="row">
+                    <div class="col-md-12">
+                        {intl l='Cette collection est lié à :'}
+                        {loop type={$collectionType} name="{$collectionType}-linked" id={$collectionItemId} visible="*"}
+                            <a href="{$URL}">#{$ID} - {$TITLE} (type : {intl l=$collectionType d='theliacollection.bo.default'})</a>
+                        {/loop}
+                    </div>
+                </div>
+                {/if}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="TC__Fields">
+                            <div class="TC__Field" style="width: 100%;max-width: 300px;">
+                                <label for="collection-name" style="font-weight: bold; padding-top: 10px">{intl l="Add items" d='theliacollection.bo.default'}</label>
+                                <div class="input-group">
+                                    <input value="" type="text" id="searchInput" class="Input__Text" placeholder="{intl l="Search"}">
+                                </div>
+                                <div id="searchResult" class="TC__Results__wrapper">
+                                    <div class="TC__Results">
+                                        <div class="TC__Results__Type hidden" data-type="category">
+                                            <div class="TC__Results__Title">{intl l='Categories'}</div>
+                                            <ul></ul>
+                                        </div>
+                                        <div class="TC__Results__Type hidden" data-type="product">
+                                            <div class="TC__Results__Title">{intl l='Products'}</div>
+                                            <ul></ul>
+                                        </div>
+                                        <div class="TC__Results__Type hidden" data-type="folder">
+                                            <div class="TC__Results__Title">{intl l='Folders'}</div>
+                                            <ul></ul>
+                                        </div>
+                                        <div class="TC__Results__Type hidden" data-type="content">
+                                            <div class="TC__Results__Title">{intl l='Contents'}</div>
+                                            <ul></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div id="collection-list">
+                            {include file="includes/collection-list.html"}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <template id="results-template">
+        <li><button data-id="%ID%" data-type="%TYPE%">#%ID% - %NAME%</button></li>
+    </template>
+
+    <link rel="stylesheet" href="{encore_module_asset file='assets/css/override.css' module="TheliaCollection"}" />
+    <link rel="stylesheet" href="{encore_module_asset file='assets/css/styles.css' module="TheliaCollection"}" />
+
+{/block}
+
+{block name="javascript-initialization"}
+    {$items = []}
+
+    {loop type="thelia_collection_item" name="collections-item" thelia_collection_id=$thelia_collection_id}
+    {$items[$ITEM_TYPE][] = {$ITEM_ID}}
+    {/loop}
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const collectionList = {$items|json_encode nofilter};
+        const collectionId = {$thelia_collection_id};
+        const collectionType = '{$collectionType}';
+    </script>
+{literal}
+    <script>
+        function template( templateId, data ){
+            const template = document.getElementById( templateId );
+            const templateCopy = document.createElement('template');
+            templateCopy.innerHTML = template.innerHTML
+                .replace(
+                    /%(\w*)%/g,
+                    function( m, key ){
+                        return data.hasOwnProperty( key ) ? data[ key ] : "";
+                    }
+                );
+            const result = templateCopy.content.children;
+            if (result.length === 1) return result[0];
+            return result;
+        }
+    </script>
+
+    <script>
+        const searchInput = document.querySelector("#searchInput");
+        const resultTypes = document.querySelectorAll(".TC__Results__Type");
+        let timer;
+        deleteItemsListener();
+
+        searchInput.addEventListener("keyup", (event) => {
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                search(event.target.value);
+            }, 500);
+        });
+
+        async function search(query) {
+            resultTypes.forEach(el => {
+                el.classList.add('hidden');
+                el.querySelector('ul').innerHTML = '';
+            });
+            if (query === '') return;
+            const [products, categories, contents, folders] = await Promise.all([
+                searchByType(query, 'product'),
+                searchByType(query, 'category'),
+                searchByType(query, 'content'),
+                searchByType(query, 'folder')
+            ]);
+            fillByType('product', products);
+            fillByType('category', categories);
+            fillByType('content', contents);
+            fillByType('folder', folders);
+        }
+
+
+
+        function deleteItemsListener() {
+            document.querySelectorAll('.TC__Button[data-delete]').forEach(el => {
+                el.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    if (window.confirm("Do you really want to delete this item?")) {
+                        const itemId = el.dataset.itemId;
+                        const itemType = el.dataset.itemType;
+                        const response = await deleteItem(itemId,itemType);
+
+                        if (response.status === 200) {
+                            // remove from collectionList
+                            const index = collectionList[itemType].indexOf(itemId);
+                            if (index > -1) {
+                                collectionList[itemType].splice(index, 1);
+                            }
+                            const row = el.closest('tr');
+                            row.remove();
+                        }
+                    }
+                })
+            });
+        }
+
+        async function deleteItem(itemId, itemType) {
+            return await axios.delete(`/open_api/collection/${collectionId}/item`, {
+                data: {itemId, itemType}
+            });
+        }
+
+        async function addItem(e) {
+            const itemId       = e.currentTarget.dataset?.id;
+            const itemType     = e.currentTarget.dataset?.type;
+            const response = await axios.post(`/open_api/collection/${collectionId}/item`, {
+                itemId,
+                itemType
+            });
+
+            if (response.status === 200) {
+                const {data: {html}} = await axios.get(`/admin/module/TheliaCollection/collection-list`, {
+                    params: {
+                        thelia_collection_id: collectionId
+                    }
+                });
+                document.querySelector('#collection-list').innerHTML = html;
+                if (!collectionList[itemType]) {
+                    collectionList[itemType] = [];
+                }
+                collectionList[itemType].push(itemId);
+                searchInput.value = '';
+                search('');
+                deleteItemsListener();
+            }
+        }
+
+        function fillByType(type, items) {
+            if (items.length <= 0) return;
+            const itemBloc = document.querySelector(`.TC__Results__Type[data-type='${type}']`);
+            itemBloc.classList.remove('hidden');
+            const collectionItems = collectionList[type] ?? [];
+            items.forEach(item => {
+                if (collectionItems.includes(item.id.toString())) return;
+                const row = template("results-template", {ID: item.id, TYPE: type, NAME: item.i18n?.title});
+                itemBloc.querySelector('ul').appendChild(row);
+                row.querySelector('button').addEventListener('click', addItem);
+            });
+        }
+
+        async function searchByType(query, type) {
+            if (collectionType && collectionType !== type) return [];
+            const [visible, noVisible] = await Promise.all([searchVisible(query, type), searchNoVisible(query, type)]);
+
+            return [... visible, ...noVisible];
+        }
+        async function searchVisible(query, type) {
+            const response = await axios.get(`/open_api/${type}/search`, {
+                params: {
+                    ref  : query,
+                    title: query,
+                    limit: 12
+                }
+            });
+            return response?.data || [];
+        }
+
+        async function searchNoVisible(query, type) {
+            const response = await axios.get(`/open_api/${type}/search`, {
+                params: {
+                    ref  : query,
+                    title: query,
+                    limit: 12,
+                    visible: 0
+                }
+            });
+            return response?.data || [];
+        }
+    </script>
+{/literal}
+{/block}
