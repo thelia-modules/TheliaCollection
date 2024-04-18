@@ -9,6 +9,7 @@ use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
 use TheliaCollection\Event\CollectionUpdateObjectPositionEvent;
 use TheliaCollection\Event\TheliaCollectionEvents;
+use TheliaCollection\Form\CreateCollectionForm;
 use TheliaCollection\Model\TheliaCollectionQuery;
 use Symfony\Component\Routing\Annotation\Route;
 use TheliaCollection\Service\CollectionService;
@@ -82,5 +83,33 @@ class ConfigurationBackController extends BaseAdminController
         }
 
         return $this->generateRedirect('/admin/module/TheliaCollection/view?thelia_collection_id=' . $collectionId);
+    }
+
+    /**
+     * @Route("/admin/module/TheliaCollection/create-collection", name="create_collection_action") /
+     */
+    public function createCollectionAction(EventDispatcherInterface $dispatcher, Request $request, CollectionService $collectionService)
+    {
+        $createForm = $this->createForm(CreateCollectionForm::getName());
+
+        try {
+            $form = $this->validateForm($createForm, 'post');
+            $data = $form->getData();
+            $data;
+
+            $collection = $collectionService->createCollection(
+                null,
+                $data['item_type'],
+                $data['code'],
+                $data['name'],
+                true,
+                $data['locale']
+            );
+        } catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        return $this->generateRedirect('/admin/module/TheliaCollection');
     }
 }
