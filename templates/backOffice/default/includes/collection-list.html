@@ -12,8 +12,18 @@
         {$item_position = $POSITION}
         {$item_id = $ID}
         {loop type={$ITEM_TYPE} name="{$ITEM_ID}-colletion-items" id={$ITEM_ID} visible="*"}
+            {$url = ''}
+            {if $ITEM_TYPE == 'product'}
+                {$url ={url path='/admin/products/update' product_id=$ITEM_ID}}
+            {elseif $ITEM_TYPE == 'category'}
+                {$url ={url path='/admin/categories/update' category_id=$ITEM_ID}}
+            {elseif $ITEM_TYPE == 'folder'}
+                {$url ={url path='/admin/folders/update/%id' id=$ITEM_ID}}
+            {elseif $ITEM_TYPE == 'content'}
+                {$url ={url path='/admin/content/update/%id' id=$ITEM_ID}}
+            {/if}
             <tr class="TC__Table__Row">
-                <td class="TC__Table__Row__Id">#{$ID}</td>
+                <td class="TC__Table__Row__Id"><a href="{$url}">#{$ID}</a></td>
                 <td class="TC__Table__Row__Position">
                     <a href="{url path="/admin/module/TheliaCollection/update-position" mode="up" item_id=$item_id collection_id=$thelia_collection_id}" class="u-position-up"><i class="glyphicon glyphicon-arrow-up"></i></a>
                     <span>{$item_position}</span>

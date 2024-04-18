@@ -68,7 +68,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                        {loop type="thelia_collection_item" name="collections-item" item_id=$itemId}
+                        {loop type="thelia_collection_item" name="collections-item" item_type=$itemType item_id=$itemId}
                             {loop type="thelia_collection" name="collections" id=$THELIA_COLLECTION_ID}
                                 <tr class="TC__Table__Row">
                                     <td class="TC__Table__Row__Id">#{$ID}</td>
