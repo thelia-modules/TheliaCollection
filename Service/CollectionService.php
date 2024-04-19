@@ -4,6 +4,7 @@ namespace TheliaCollection\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use TheliaCollection\Model\TheliaCollection;
@@ -231,5 +232,33 @@ class CollectionService
         $collection->save();
 
         return $collection;
+    }
+
+    public function updateItemPosition(
+        ?int $itemId = null,
+        ?int $position = null,
+        ?int $positionMovement = null
+    ) {
+        $item = TheliaCollectionItemQuery::create()->findPk($itemId);
+
+        if (null === $item) {
+            throw new \Exception(Translator::getInstance()->trans("Can't update an item that doesn't exist"));
+        }
+
+        if (null != $position) {
+            $item->changeAbsolutePosition($position);
+        }
+
+        if (UpdatePositionEvent::POSITION_UP === $positionMovement) {
+            $item->movePositionUp();
+        }
+
+        if (UpdatePositionEvent::POSITION_DOWN === $positionMovement) {
+            $item->movePositionDown();
+        }
+
+        $item->save();
+
+        return $item;
     }
 }

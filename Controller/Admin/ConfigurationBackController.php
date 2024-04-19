@@ -2,11 +2,17 @@
 
 namespace TheliaCollection\Controller\Admin;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
+use TheliaCollection\Event\CollectionUpdateObjectPositionEvent;
+use TheliaCollection\Event\TheliaCollectionEvents;
+use TheliaCollection\Form\CreateCollectionForm;
 use TheliaCollection\Model\TheliaCollectionQuery;
 use Symfony\Component\Routing\Annotation\Route;
+use TheliaCollection\Service\CollectionService;
 
 class ConfigurationBackController extends BaseAdminController
 {
@@ -50,5 +56,60 @@ class ConfigurationBackController extends BaseAdminController
 
         return $theliaCollection;
 
+    }
+
+    /**
+     * @Route("/admin/module/TheliaCollection/update-position", name="update_object_position_action") /
+     */
+    public function updateObjectPositionAction(EventDispatcherInterface $dispatcher, Request $request, CollectionService $collectionService)
+    {
+        try {
+            $mode = $request->get('mode', null);
+
+            if ($mode == 'up')
+                $mode = UpdatePositionEvent::POSITION_UP;
+            elseif ($mode == 'down')
+                $mode = UpdatePositionEvent::POSITION_DOWN;
+            else
+                $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
+
+            $position = $request->get('position', null);
+            $collectionId = $request->get('collection_id', null);
+            $itemId = $request->get('item_id', null);
+            $collectionService->updateItemPosition($itemId, $position, $mode);
+        } catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        return $this->generateRedirect('/admin/module/TheliaCollection/view?thelia_collection_id=' . $collectionId);
+    }
+
+    /**
+     * @Route("/admin/module/TheliaCollection/create-collection", name="create_collection_action") /
+     */
+    public function createCollectionAction(EventDispatcherInterface $dispatcher, Request $request, CollectionService $collectionService)
+    {
+        $createForm = $this->createForm(CreateCollectionForm::getName());
+
+        try {
+            $form = $this->validateForm($createForm, 'post');
+            $data = $form->getData();
+            $data;
+
+            $collection = $collectionService->createCollection(
+                null,
+                $data['item_type'],
+                $data['code'],
+                $data['name'],
+                true,
+                $data['locale']
+            );
+        } catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        return $this->generateRedirect('/admin/module/TheliaCollection');
     }
 }

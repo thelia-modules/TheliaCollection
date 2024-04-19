@@ -1,32 +1,46 @@
-{$items = []}
-{loop type="thelia_collection_item" name="collections-item" thelia_collection_id=$thelia_collection_id}
-    {$items[$ITEM_TYPE][] = {$ITEM_ID}}
-{/loop}
-{foreach from=['category','product', 'folder', 'content'] item=type}
-    {if isset($items[$type])}
-        <h2 class="TC__Table__Title">{intl l='title_'|cat:$type  d='theliacollection.bo.default'}</h2>
-        <table class="TC__Table">
-            <thead class="TC__Table__Header">
-            <tr>
-                <th scope="col">ID</th>
-                <th scope="col">{intl l="Title"}</th>
+<table class="TC__Table">
+    <thead class="TC__Table__Header">
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Position</th>
+        <th scope="col">Type</th>
+        <th scope="col">{intl l="Title"}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {loop type="thelia_collection_item" name="collections-item" thelia_collection_id=$thelia_collection_id}
+        {$item_position = $POSITION}
+        {$item_id = $ID}
+        {loop type={$ITEM_TYPE} name="{$ITEM_ID}-colletion-items" id={$ITEM_ID} visible="*"}
+            {$url = ''}
+            {if $ITEM_TYPE == 'product'}
+                {$url ={url path='/admin/products/update' product_id=$ITEM_ID}}
+            {elseif $ITEM_TYPE == 'category'}
+                {$url ={url path='/admin/categories/update' category_id=$ITEM_ID}}
+            {elseif $ITEM_TYPE == 'folder'}
+                {$url ={url path='/admin/folders/update/%id' id=$ITEM_ID}}
+            {elseif $ITEM_TYPE == 'content'}
+                {$url ={url path='/admin/content/update/%id' id=$ITEM_ID}}
+            {/if}
+            <tr class="TC__Table__Row">
+                <td class="TC__Table__Row__Id"><a href="{$url}">#{$ID}</a></td>
+                <td class="TC__Table__Row__Position">
+                    <a href="{url path="/admin/module/TheliaCollection/update-position" mode="up" item_id=$item_id collection_id=$thelia_collection_id}" class="u-position-up"><i class="glyphicon glyphicon-arrow-up"></i></a>
+                    <span>{$item_position}</span>
+                    <a href="{url path="/admin/module/TheliaCollection/update-position" mode="down" item_id=$item_id collection_id=$thelia_collection_id}" class="u-position-down"><i class="glyphicon glyphicon-arrow-down"></i></a>
+                </td>
+                <td class="TC__Table__Row__Type">{intl l=$ITEM_TYPE  d='theliacollection.bo.default'}</td>
+                <td class="TC__Table__Row__Title">{$TITLE}</td>
+                <td class="TC__Table__Row__Actions">
+                    <div class="TC__Table__Row__Actions__Wrapper">
+                        <button class="TC__Button" data-delete data-item-type="{$ITEM_TYPE}" data-item-id="{$ID}">
+                            <i class="fas fa-unlink"></i>
+                        </button>
+                    </div>
+                </td>
             </tr>
-            </thead>
-            <tbody>
-            {loop type={$type} name="{$type}-colletion-items" id={','|implode:$items[$type]} visible="*"}
-                <tr class="TC__Table__Row">
-                    <td class="TC__Table__Row__Id">#{$ID}</td>
-                    <td class="TC__Table__Row__Title">{$TITLE}</td>
-                    <td class="TC__Table__Row__Actions">
-                        <div class="TC__Table__Row__Actions__Wrapper">
-                            <button class="TC__Button" data-delete data-item-type="{$type}" data-item-id="{$ID}">
-                                <i class="fas fa-unlink"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            {/loop}
-            </tbody>
-        </table>
-    {/if}
-{/foreach}
+        {/loop}
+    {/loop}
+
+    </tbody>
+</table>
