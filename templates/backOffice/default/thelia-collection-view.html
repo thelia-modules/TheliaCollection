@@ -138,7 +138,7 @@
             });
             if (query === '') return;
             const [products, categories, contents, folders] = await Promise.all([
-                searchByType(query, 'product'),
+                searchByProductType(query, 'product'),
                 searchByType(query, 'category'),
                 searchByType(query, 'content'),
                 searchByType(query, 'folder')
@@ -218,16 +218,30 @@
             });
         }
 
+        async function searchByProductType(query, type) {
+            if (collectionType && collectionType !== type) return [];
+            const [visible, noVisible, refVisible, refNoVisible] = await Promise.all([
+                searchVisible(query, type),
+                searchNoVisible(query, type),
+                searchRefVisible(query, type),
+                searchRefNoVisible(query,type),
+            ]);
+
+            return [... visible, ...noVisible,... refVisible, ...refNoVisible];
+        }
+
         async function searchByType(query, type) {
             if (collectionType && collectionType !== type) return [];
-            const [visible, noVisible] = await Promise.all([searchVisible(query, type), searchNoVisible(query, type)]);
+            const [visible, noVisible, refVisible, refNoVisible] = await Promise.all([
+                searchVisible(query, type),
+                searchNoVisible(query, type),
+            ]);
 
             return [... visible, ...noVisible];
         }
         async function searchVisible(query, type) {
             const response = await axios.get(`/open_api/${type}/search`, {
                 params: {
-                    ref  : query,
                     title: query,
                     limit: 12
                 }
@@ -238,8 +252,28 @@
         async function searchNoVisible(query, type) {
             const response = await axios.get(`/open_api/${type}/search`, {
                 params: {
-                    ref  : query,
                     title: query,
+                    limit: 12,
+                    visible: 0
+                }
+            });
+            return response?.data || [];
+        }
+
+        async function searchRefVisible(query, type) {
+            const response = await axios.get(`/open_api/${type}/search`, {
+                params: {
+                    reference  : query,
+                    limit: 12
+                }
+            });
+            return response?.data || [];
+        }
+
+        async function searchRefNoVisible(query, type) {
+            const response = await axios.get(`/open_api/${type}/search`, {
+                params: {
+                    reference  : query,
                     limit: 12,
                     visible: 0
                 }
